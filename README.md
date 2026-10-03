@@ -20,4 +20,6 @@ See [docs/plan.md](docs/plan.md) for scope, the log format, and how releases are
 
 Pull-request builds produce the signed APK artifact. Merges to `main` publish that same APK to GitHub Releases when `CHANGELOG.md` has short bullet points for that version.
 
-Repository maintainers must configure these GitHub Actions secrets before the first app build: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, and `ANDROID_KEY_PASSWORD`. Use one Snoopy-only release keystore for every APK. Do not reuse the Nucleus key.
+With no `ANDROID_KEYSTORE_BASE64` repository secret, GitHub Actions signs release APKs with the debug keystore bundled in `app/debug.keystore`. That certificate stays the same across builds, so a newer APK can install over an older one.
+
+To sign with your own key instead, add these repository secrets: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, and `ANDROID_KEY_PASSWORD`. If `ANDROID_KEYSTORE_BASE64` is set, all three password or alias secrets are required.

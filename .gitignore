@@ -5,6 +5,7 @@ local.properties
 .idea/
 .DS_Store
 *.keystore
+!app/debug.keystore
 *.jks
 signing/
 captures/

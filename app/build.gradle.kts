@@ -27,6 +27,12 @@ android {
     }
 
     signingConfigs {
+        create("bundledDebug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         create("release") {
             val keystorePath = file("release.keystore")
             if (!keystorePath.exists()) return@create
@@ -46,7 +52,11 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (file("release.keystore").exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("bundledDebug")
+            }
             ndk {
                 abiFilters += listOf("arm64-v8a")
             }
@@ -74,22 +84,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-}
-
-tasks.matching { it.name == "assembleRelease" }.configureEach {
-    doFirst {
-        val keystorePath = file("release.keystore")
-        if (!keystorePath.exists()) {
-            throw GradleException(
-                "Release keystore missing. Add ANDROID_KEYSTORE_* repository secrets before building a release APK.",
-            )
-        }
-        val required = listOf("ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD")
-        val missing = required.filter { System.getenv(it).isNullOrBlank() }
-        if (missing.isNotEmpty()) {
-            throw GradleException("Release signing secrets missing: ${missing.joinToString()}")
         }
     }
 }
