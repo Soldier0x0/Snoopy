@@ -55,7 +55,10 @@ object SessionLog {
 
     fun readableText(bytes: ByteArray): String {
         if (bytes.isEmpty()) return ""
-        if (bytes.any { it < 0x09 || (it > 0x0d && it < 0x20) || it == 0x7f }) {
+        if (bytes.any {
+                val unsigned = it.toInt() and 0xff
+                unsigned < 0x09 || (unsigned > 0x0d && unsigned < 0x20) || unsigned == 0x7f
+            }) {
             return ""
         }
         return bytes.toString(Charsets.UTF_8)
